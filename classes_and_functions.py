@@ -17,19 +17,24 @@ class State:
     def move(self, movestring, show="No"):
         """
         Make change to state based on input.
-        1C == move 1 chicken
-        2W == move 2 wolves
-        1C1W == move 1 chicken and 1 wolf
+        - Format
+            1C == move 1 chicken
+            2W == move 2 wolves
+            1C1W == move 1 chicken and 1 wolf
+        - Assumes boat direction, i.e. If boat is on left, assume movement to the right.
+        - Does not accept movement w/o animal
+        - Returns new state as a State class object
+        - Does NOT alter state of current object
         """
         if movestring == "1C1W":
-            if self.left[2] == 1:
+            if self.left[2] == 1:  # Left to right
                 output = State(
                     (
                         [self.left[0] - 1, self.left[1] - 1, 0],
                         [self.right[0] + 1, self.right[1] + 1, 1],
                     )
                 )
-            else:
+            else:  # Right to left
                 output = State(
                     (
                         [self.left[0] + 1, self.left[1] + 1, 1],
@@ -41,30 +46,30 @@ class State:
             animal = moveset[1]
             num = int(moveset[0])
 
-            if self.left[2] == 1:
-                if animal == "C":
+            if self.left[2] == 1:  # left to right
+                if animal == "C":  # [c h i c k e n s]
                     output = State(
                         (
                             [self.left[0] - num, self.left[1], 0],
                             [self.right[0] + num, self.right[1], 1],
                         )
                     )
-                else:
+                else:  # wolves
                     output = State(
                         (
                             [self.left[0], self.left[1] - num, 0],
                             [self.right[0], self.right[1] + num, 1],
                         )
                     )
-            else:
-                if animal == "C":
+            else:  # Right to left
+                if animal == "C":  # [c h i c k e n s]
                     output = State(
                         (
                             [self.left[0] + num, self.left[1], 1],
                             [self.right[0] - num, self.right[1], 0],
                         )
                     )
-                else:
+                else:  # Wolves
                     output = State(
                         (
                             [self.left[0], self.left[1] + num, 1],
@@ -72,6 +77,7 @@ class State:
                         )
                     )
 
+        # Handle for displaying movement
         if show == "Yes":
             if self.right[2] == 1:
                 print(f"{output.left}~->~{output.right}")
