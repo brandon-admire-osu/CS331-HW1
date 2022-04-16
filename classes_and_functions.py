@@ -128,6 +128,17 @@ class State:
         return output
 
 
+def pathFind(node, initial):
+    output = []
+    current = node
+    while current.parent != initial:
+        output.append(current)
+        current = current.parent
+    output.append(initial)
+    output.reverse()
+    return output
+
+
 def injest(path):
     """
     Take target state file and return an array of tuples, each tuple representing a starting state.

@@ -3,7 +3,7 @@ from classes_and_functions import *
 possible_moves = ["1C", "1W", "2C", "2W", "1C1W"]
 
 
-def treeSearch(initial_state, goal, pop_order, depth_limit=None):
+def treeSearch(initial_state, goal, pop_order, depth_limit=None, p=0):
     nodes_expanded = 0
     if initial_state == goal:
         return True, nodes_expanded
@@ -14,14 +14,9 @@ def treeSearch(initial_state, goal, pop_order, depth_limit=None):
             if len(frontier) >= 1:
                 current = frontier.pop(pop_order)  # Pop specified item off frontier
                 if current == goal:
-                    output = []
-                    while current.parent != initial_state:
-                        output.append(current)
-                        current = current.parent
-                    output.append(initial_state)
-                    output.reverse()
-                    for out in output:
-                        print(out)
+                    if p:
+                        for node in pathFind(current, initial_state):
+                            print(node)
                     return True, nodes_expanded
                 else:
                     nodes_expanded += 1
@@ -45,23 +40,23 @@ def treeSearch(initial_state, goal, pop_order, depth_limit=None):
 
 
 # Breadth-First Search
-def breadthFirst(initial_state, goal):
+def breadthFirst(initial_state, goal, p=0):
     # FIFO
-    return treeSearch(initial_state, goal, 0)
+    return treeSearch(initial_state, goal, 0, p=p)
 
 
 # Depth-First Search
-def depthFirst(initial_state, goal, depth_limit=None):
+def depthFirst(initial_state, goal, depth_limit=None, p=0):
     # LIFO
-    return treeSearch(initial_state, goal, -1, depth_limit)
+    return treeSearch(initial_state, goal, -1, depth_limit, p=p)
 
 
 # Iterative-Deepening Depth First Search
-def deepDepthFirst(initial_state, goal):
+def deepDepthFirst(initial_state, goal, p=0):
     depth_count = 0
     counter = 0
     while 1:
-        result, count = depthFirst(initial_state, goal, depth_limit=depth_count)
+        result, count = depthFirst(initial_state, goal, depth_limit=depth_count, p=p)
         counter += count
         if result == True:
             return counter
@@ -69,7 +64,7 @@ def deepDepthFirst(initial_state, goal):
 
 
 # A Star Search
-def aStar(initial_state, goal):
+def aStar(initial_state, goal, p=0):
     def h(state):
         # Assumes left is always goal bank. If not the case, prof is monster
         num = state.right[0] + state.right[1]
@@ -85,15 +80,9 @@ def aStar(initial_state, goal):
             priority.sort(key=lambda x: x[1])  # Sort queue by cost
             current = priority.pop(-1)  # Get lowest cost item
             if current[0] == goal:
-                output = []
-                current = current[0]
-                while current.parent != initial_state:
-                    output.append(current)
-                    current = current.parent
-                output.append(initial_state)
-                output.reverse()
-                for out in output:
-                    print(out)
+                if p:
+                    for node in pathFind(current[0], initial_state):
+                        print(node)
                 return nodes_expanded
             else:
                 nodes_expanded += 1
@@ -120,45 +109,53 @@ if __name__ == "__main__":
     goal_state = State(injest(sys.argv[2]))
 
     if sys.argv[3] == "bfs":
-        print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
+        print(
+            f"Number of nodes expanded: {breadthFirst(initial_state,goal_state, p=1)[1]}"
+        )
         sys.stdout = open(sys.argv[4], "w")
-        print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
+        print(
+            f"Number of nodes expanded: {breadthFirst(initial_state,goal_state, p=1)[1]}"
+        )
         sys.stdout.close()
     elif sys.argv[3] == "dfs":
-        print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
+        print(
+            f"Number of nodes expanded: {depthFirst(initial_state,goal_state, p=1)[1]}"
+        )
         sys.stdout = open(sys.argv[4], "w")
-        print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
+        print(
+            f"Number of nodes expanded: {depthFirst(initial_state,goal_state, p=1)[1]}"
+        )
     elif sys.argv[3] == "iddfs":
-        print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
+        print(
+            f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state, p=1)}"
+        )
         sys.stdout = open(sys.argv[4], "w")
-        print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
+        print(
+            f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state, p=1)}"
+        )
     elif sys.argv[3] == "astar":
-        print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
+        print(f"Number of nodes expanded: {aStar(initial_state,goal_state, p=1)}")
         sys.stdout = open(sys.argv[4], "w")
-        print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
+        print(f"Number of nodes expanded: {aStar(initial_state,goal_state, p=1)}")
 
     # for i in range(1, 4):
     #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
     #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
-    #     sys.stdout = open(f"{sys.argv[3]}out{i}bfs.txt", "w")
+    #     print(f"bfs case {i}")
     #     print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
-    #     sys.stdout.close()
 
     #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
     #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
-    #     sys.stdout = open(f"{sys.argv[3]}out{i}dfs.txt", "w")
+    #     print(f"dfs case {i}")
     #     print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
-    #     sys.stdout.close()
 
     #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
     #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
-    #     sys.stdout = open(f"{sys.argv[3]}out{i}iddfs.txt", "w")
+    #     print(f"iddfs case {i}")
     #     print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
-    #     sys.stdout.close()
 
     #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
     #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
-    #     sys.stdout = open(f"{sys.argv[3]}out{i}astar.txt", "w")
+    #     print(f"aStar case {i}")
     #     print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
-    #     sys.stdout.close()
 
