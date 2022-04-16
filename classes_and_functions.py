@@ -154,9 +154,13 @@ def injest(path):
 
 
 if __name__ == "__main__":
-    test1_state = State(injest("./goalsAndStates/tests/start1.txt"))
-    test1_state2 = State(injest("./goalsAndStates/tests/start1.txt"))
-    test2 = State(injest("./goalsAndStates/tests/start2.txt"))
-    print(test1_state == test1_state2)
-    print(test1_state == test2)
+    a = [2, 3, 6, 1, 2, 0, 9]
+    a.sort(key=lambda x: x)
+    print(a)
+
+    # test1_state = State(injest("./goalsAndStates/tests/start1.txt"))
+    # test1_state2 = State(injest("./goalsAndStates/tests/start1.txt"))
+    # test2 = State(injest("./goalsAndStates/tests/start2.txt"))
+    # print(test1_state == test1_state2)
+    # print(test1_state == test2)
 

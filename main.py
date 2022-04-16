@@ -1,7 +1,5 @@
 from classes_and_functions import *
 
-possible_moves = ["1C", "1W", "2C", "2W", "1C1W"]
-
 
 def treeSearch(initial_state, goal, pop_order, depth_limit=None, p=0):
     nodes_expanded = 0
@@ -14,8 +12,10 @@ def treeSearch(initial_state, goal, pop_order, depth_limit=None, p=0):
             if len(frontier) >= 1:
                 current = frontier.pop(pop_order)  # Pop specified item off frontier
                 if current == goal:
+                    path = pathFind(current, initial_state)
+                    print(f"The length of the solution is: {len(path)}")
                     if p:
-                        for node in pathFind(current, initial_state):
+                        for node in path:
                             print(node)
                     return True, nodes_expanded
                 else:
@@ -23,12 +23,11 @@ def treeSearch(initial_state, goal, pop_order, depth_limit=None, p=0):
                     candidates = current.expand()
                     explored.append(current)
                     for state in candidates:
-                        # print(state, bool(state))
                         if state:  # Check if valid
                             if state not in explored:
                                 if state not in frontier:
                                     if depth_limit is not None:
-                                        if state.depth > depth_limit:
+                                        if state.depth <= depth_limit:
                                             frontier.append(state)
                                     else:
                                         frontier.append(state)
@@ -36,7 +35,7 @@ def treeSearch(initial_state, goal, pop_order, depth_limit=None, p=0):
                 if depth_limit is not None:
                     return False, nodes_expanded
                 else:
-                    return -1
+                    return False, -1
 
 
 # Breadth-First Search
@@ -69,6 +68,7 @@ def aStar(initial_state, goal, p=0):
         # Assumes left is always goal bank. If not the case, prof is monster
         num = state.right[0] + state.right[1]
         # Depth is an abstraction of cost by way of moves made
+
         return state.depth - num
 
     # States stored as (state,h(n) score)
@@ -80,8 +80,10 @@ def aStar(initial_state, goal, p=0):
             priority.sort(key=lambda x: x[1])  # Sort queue by cost
             current = priority.pop(-1)  # Get lowest cost item
             if current[0] == goal:
+                path = pathFind(current[0], initial_state)
+                print(f"The length of the solution is: {len(path)}")
                 if p:
-                    for node in pathFind(current[0], initial_state):
+                    for node in path:
                         print(node)
                 return nodes_expanded
             else:
@@ -94,6 +96,8 @@ def aStar(initial_state, goal, p=0):
                             priority.append(
                                 (state, h(state))
                             )  # Add to queue with calculated h(n) value
+        else:
+            return False, -1
 
 
 if __name__ == "__main__":
