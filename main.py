@@ -4,7 +4,6 @@ possible_moves = ["1C", "1W", "2C", "2W", "1C1W"]
 
 
 def treeSearch(initial_state, goal, pop_order, depth_limit=None):
-    current_depth = 0
     nodes_expanded = 0
     if initial_state == goal:
         return True, nodes_expanded
@@ -71,19 +70,95 @@ def deepDepthFirst(initial_state, goal):
 
 # A Star Search
 def aStar(initial_state, goal):
-    pass
+    def h(state):
+        # Assumes left is always goal bank. If not the case, prof is monster
+        num = state.right[0] + state.right[1]
+        # Depth is an abstraction of cost by way of moves made
+        return state.depth - num
+
+    # States stored as (state,h(n) score)
+    priority = [(initial_state, 0)]  # Priority queue
+    explored = []
+    nodes_expanded = 0
+    while 1:
+        if len(priority) >= 1:  # Check for no possible path
+            priority.sort(key=lambda x: x[1])  # Sort queue by cost
+            current = priority.pop(-1)  # Get lowest cost item
+            if current[0] == goal:
+                output = []
+                current = current[0]
+                while current.parent != initial_state:
+                    output.append(current)
+                    current = current.parent
+                output.append(initial_state)
+                output.reverse()
+                for out in output:
+                    print(out)
+                return nodes_expanded
+            else:
+                nodes_expanded += 1
+                explored.append(current[0])
+                cadidates = current[0].expand()
+                for state in cadidates:
+                    if state:  # Check if valid state
+                        if state not in explored:  # Check if explored
+                            priority.append(
+                                (state, h(state))
+                            )  # Add to queue with calculated h(n) value
 
 
 if __name__ == "__main__":
-    initial_state = State(injest("./goalsAndStates/tests/start1.txt"))
-    goal = State(injest("./goalsAndStates/goals/goal1.txt"))
-    print(
-        f"Number of nodes expanded for depth first: {depthFirst(initial_state, goal)}"
-    )
-    print(
-        f"Number of nodes expanded for breadth first: {breadthFirst(initial_state, goal)}"
-    )
-    print(
-        f"Number of nodes expanded for deep depth first: {deepDepthFirst(initial_state, goal)}"
-    )
+    import sys
+
+    # < initial state file > < goal state file > < mode > < output file >
+    # bfs (for breadth-first search)
+    # dfs (for depth-first search)
+    # iddfs (for iterative deepening depth-first search)
+    # astar (for A-Star search below)
+
+    initial_state = State(injest(sys.argv[1]))
+    goal_state = State(injest(sys.argv[2]))
+
+    if sys.argv[3] == "bfs":
+        print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
+        sys.stdout = open(sys.argv[4], "w")
+        print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
+        sys.stdout.close()
+    elif sys.argv[3] == "dfs":
+        print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
+        sys.stdout = open(sys.argv[4], "w")
+        print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
+    elif sys.argv[3] == "iddfs":
+        print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
+        sys.stdout = open(sys.argv[4], "w")
+        print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
+    elif sys.argv[3] == "astar":
+        print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
+        sys.stdout = open(sys.argv[4], "w")
+        print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
+
+    # for i in range(1, 4):
+    #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
+    #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
+    #     sys.stdout = open(f"{sys.argv[3]}out{i}bfs.txt", "w")
+    #     print(f"Number of nodes expanded: {breadthFirst(initial_state,goal_state)[1]}")
+    #     sys.stdout.close()
+
+    #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
+    #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
+    #     sys.stdout = open(f"{sys.argv[3]}out{i}dfs.txt", "w")
+    #     print(f"Number of nodes expanded: {depthFirst(initial_state,goal_state)[1]}")
+    #     sys.stdout.close()
+
+    #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
+    #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
+    #     sys.stdout = open(f"{sys.argv[3]}out{i}iddfs.txt", "w")
+    #     print(f"Number of nodes expanded: {deepDepthFirst(initial_state,goal_state)}")
+    #     sys.stdout.close()
+
+    #     initial_state = State(injest(f"{sys.argv[1]}start{i}.txt"))
+    #     goal_state = State(injest(f"{sys.argv[2]}goal{i}.txt"))
+    #     sys.stdout = open(f"{sys.argv[3]}out{i}astar.txt", "w")
+    #     print(f"Number of nodes expanded: {aStar(initial_state,goal_state)}")
+    #     sys.stdout.close()
 
